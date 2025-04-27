@@ -5,7 +5,15 @@
 </template>
 
 <script>
+import router from './router'; 
 
+export default {
+  name: 'App',
+  mounted() {
+    // Example: Access router programmatically
+    console.log('Current route:', router.currentRoute.value);
+  },
+};
 </script>
 
 <style>
