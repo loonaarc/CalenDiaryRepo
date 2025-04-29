@@ -1,47 +1,68 @@
-
-<!-- src/views/UserView.vue -->
 <template>
-    <v-app>
-      <v-main>
-        <v-container>
-          <UserForm @user-created="loadUsers" />
+  <v-app>
+    <v-main>
+      <v-container>
+        <!-- Header with add button -->
+        <v-row class="justify-space-between align-center">
+          <v-col>
+            <h1>Users</h1>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn color="primary" @click="showDialog = true">Add User</v-btn>
+          </v-col>
+        </v-row>
 
-          <v-data-table
-            :headers="headers"
-            :items="users"
-            class="elevation-1"
-          />
-        </v-container>
-      </v-main>
-    </v-app>
-  </template>
+        <!-- Table with users -->
+        <v-data-table
+          :headers="headers"
+          :items="users"
+          class="elevation-1"
+        ></v-data-table>
 
-  <script setup>
-  import UserForm from '@/components/UserForm.vue'
-import api from '@/services/api'
+        <!-- Dialog with user form -->
+        <v-dialog v-model="showDialog" max-width="500">
+          <v-card>
+            <v-card-title class="text-h6">Add User</v-card-title>
+            <v-card-text>
+              <UserForm @user-created="onUserCreated" />
+            </v-card-text>
+          </v-card>
+        </v-dialog>
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
+
+<script setup>
+import UserForm from '@/components/UserForm.vue'
+import userService from '@/services/userService'
 import { onMounted, ref } from 'vue'
 
-  const users = ref([])
+const users = ref([])
+const showDialog = ref(false)
 
-  const headers = [
-    { text: 'ID', value: 'id' },
-    { text: 'Name', value: 'name' },
-    { text: 'Email', value: 'email' },
-    { text: 'Username', value: 'username' },
-    { text: 'Active', value: 'active' },
-    { text: 'Created At', value: 'createdAt' }
-  ]
+const headers = [
+  { text: 'ID', value: 'id' },
+  { text: 'Name', value: 'name' },
+  { text: 'Email', value: 'email' },
+  { text: 'Username', value: 'username' },
+  { text: 'Active', value: 'active' },
+  { text: 'Created At', value: 'createdAt' },
+]
 
-  const loadUsers = async () => {
-    try {
-      const response = await api.get('/users')
-      users.value = response.data
-    } catch (error) {
-      console.error('Error loading users:', error)
-    }
-  }
+// Load user list
+const loadUsers = async () => {
+  const response = await userService.getAll()
+  users.value = response.data
+}
 
-  onMounted(() => {
-    loadUsers()
-  })
+// Called when user is successfully created
+const onUserCreated = () => {
+  loadUsers()
+  showDialog.value = false // close the dialog
+}
+
+onMounted(() => {
+  loadUsers()
+})
 </script>

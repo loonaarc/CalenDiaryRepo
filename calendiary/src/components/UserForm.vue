@@ -1,63 +1,83 @@
-// src/components/UserForm.vue
 <template>
-  <v-form @submit.prevent="submitForm" ref="formRef" v-model="valid">
+  <v-form @submit.prevent="submitUser" v-model="formValid" ref="formRef">
+    <v-alert
+      v-if="errorMessage"
+      type="error"
+      dismissible
+      class="mb-4"
+    >
+      {{ errorMessage }}
+    </v-alert>
+
     <v-text-field
-      v-model="form.name"
+      v-model="formData.name"
       label="Name"
       :rules="[rules.required]"
       required
     />
-
     <v-text-field
-      v-model="form.email"
+      v-model="formData.email"
       label="Email"
       :rules="[rules.required, rules.email]"
       required
     />
-
     <v-text-field
-      v-model="form.username"
+      v-model="formData.username"
       label="Username"
       :rules="[rules.required]"
       required
     />
-
-    <v-btn type="submit" color="success" :disabled="!valid">
-      Create User
-    </v-btn>
+    <v-btn type="submit" color="success" :disabled="!formValid">Create</v-btn>
   </v-form>
 </template>
 
 <script setup>
-import api from '@/services/api'
+import userService from '@/services/userService'
 import { ref } from 'vue'
 
-// Emit the event to parent
+// Emits event to parent component to refresh and close dialog
 const emit = defineEmits(['user-created'])
 
-const form = ref({
+// Flag for Vuetify form validation
+const formValid = ref(false)
+
+// Reference to the form element
+const formRef = ref(null)
+
+// Reactive user input fields
+const formData = ref({
   name: '',
   email: '',
   username: ''
 })
 
-const valid = ref(false)
-const formRef = ref(null)
+// Error message to show in UI
+const errorMessage = ref('')
 
+// Validation rules
 const rules = {
   required: v => !!v || 'Required.',
   email: v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
 }
 
-const submitForm = async () => {
+// Submits the form and creates the user
+const submitUser = async () => {
   if (!formRef.value?.validate()) return
 
   try {
-    await api.post('/users', form.value)
-    emit('user-created') // Let the parent reload the table
-    form.value = { name: '', email: '', username: '' } // Reset form
+    // Try to send data
+    await userService.create({ ...formData.value })
+    // If success, clear error and reset form
+    errorMessage.value = ''
+    emit('user-created')
+    formData.value = { name: '', email: '', username: '' }
   } catch (error) {
-    console.error('Error creating user:', error)
+    console.error('User creation failed:', error)
+    if (error.response && error.response.data && error.response.data.message) {
+      errorMessage.value = error.response.data.message
+    } else {
+      errorMessage.value = 'An unexpected error occurred.'
+    }
   }
 }
 </script>
@@ -67,4 +87,3 @@ const submitForm = async () => {
   margin-bottom: 24px;
 }
 </style>
-

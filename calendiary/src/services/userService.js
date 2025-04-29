@@ -1,21 +1,19 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost:8080/api/users';
+import api from './api';
 
 export default {
   getAll() {
-    return axios.get(API_URL);
+    return api.get('/users');
   },
   getById(id) {
-    return axios.get(`${API_URL}/${id}`);
+    return api.get(`/users/${id}`);
   },
   create(user) {
-    return axios.post(API_URL, user);
+    return api.post('/users', user);
   },
   update(id, user) {
-    return axios.put(`${API_URL}/${id}`, user);
+    return api.put(`/users/${id}`, user);
   },
   delete(id) {
-    return axios.delete(`${API_URL}/${id}`);
+    return api.delete(`/users/${id}`);
   },
 };
