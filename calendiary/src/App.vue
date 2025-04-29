@@ -1,28 +1,20 @@
 <template>
-  <div>
+  <!-- Vuetify application wrapper -->
+  <v-app>
+    <!-- This is where routed components will be rendered -->
     <router-view />
-  </div>
+  </v-app>
 </template>
 
-<script>
-import router from './router'; 
-
-export default {
-  name: 'App',
-  mounted() {
-    // Example: Access router programmatically
-    console.log('Current route:', router.currentRoute.value);
-  },
-};
+<script setup>
+// No logic needed here unless you want to add layout components
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
+<style lang="scss">
+/* Global styles can go here */
+@use 'vuetify/settings' with (
+  $color-pack: true
+);
 </style>
+
