@@ -17,7 +17,8 @@
           :headers="headers"
           :items="users"
           class="elevation-1"
-        ></v-data-table>
+        >      
+      </v-data-table>
 
         <!-- Dialog with user form -->
         <v-dialog v-model="showDialog" max-width="500">
@@ -27,13 +28,20 @@
               <UserForm @user-created="onUserCreated" />
             </v-card-text>
           </v-card>
-        </v-dialog>
+        </v-dialog>        
       </v-container>
+      
+      <v-container>
+        <CalendarView />
+      </v-container>
+
+
     </v-main>
   </v-app>
 </template>
 
 <script setup>
+import CalendarView from '@/components/CalendarView.vue'
 import UserForm from '@/components/UserForm.vue'
 import userService from '@/services/userService'
 import { onMounted, ref } from 'vue'

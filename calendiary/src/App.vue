@@ -1,6 +1,6 @@
 <template>
   <!-- Vuetify application wrapper -->
-  <v-app>
+  <v-app>    
     <!-- This is where routed components will be rendered -->
     <router-view />
   </v-app>

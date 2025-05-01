@@ -7,17 +7,8 @@ import router from './router';
 
 // Import Vuetify styles
 import 'vuetify/styles';
-// Create Vuetify instance and import all components and directives
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
+import vuetify from './plugins/vuetify.js';
 
-// Initialize Vuetify with components and directives
-const vuetify = createVuetify({
-  components,
-  directives,
-  // You can configure themes, icons, etc. here if needed
-});
 
 // Create Vue application
 const app = createApp(App);
