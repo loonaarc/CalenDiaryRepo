@@ -1,0 +1,229 @@
+openapi: 3.0.1
+info:
+  title: Calendiary API
+  description: Combined calendar, diary, and forum system
+  version: 1.0.0
+servers:
+  - url: https://api.calendiary.com/v1
+    description: Production server
+
+# Reusable components
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Combined Calendar+Diary Entry
+    CalendarDiaryEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        title:
+          type: string
+          example: "Team Meeting"
+        description:
+          type: string
+          example: "Quarterly planning session"
+        location:
+          type: string
+          example: "Conference Room A"
+        startTime:
+          type: string
+          format: date-time
+          example: "2023-06-15T09:00:00Z"
+        endTime:
+          type: string
+          format: date-time
+          example: "2023-06-15T10:00:00Z"
+        diaryEntry:
+          type: string
+          example: "Felt productive today!"
+        mood:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 4
+          description: "1=Terrible, 5=Excellent"
+        label:
+          type: string
+          enum: [work, personal, family, other]
+          example: "work"
+      required:
+        - title
+        - startTime
+
+    # Forum Post
+    ForumPost:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          example: "How to use Calendiary"
+        message:
+          type: string
+          example: "Here are some tips..."
+        author:
+          type: string
+          example: "user123"
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - title
+        - message
+
+  parameters:
+    entryId:
+      name: entryId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    viewType:
+      name: view
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [day, week, month, agenda]
+        default: month
+
+# API Endpoints
+paths:
+  # Authentication
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: { type: string }
+                password: { type: string, format: password }
+              required: [username, password]
+      responses:
+        '200':
+          description: Returns JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+
+  # Calendar/Diary Entries
+  /entries:
+    get:
+      tags: [Entries]
+      summary: Get entries for view
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/viewType'
+        - name: date
+          in: query
+          description: "Reference date for the view (YYYY-MM-DD)"
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of entries for the requested view
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CalendarDiaryEntry'
+
+    post:
+      tags: [Entries]
+      summary: Create new combined entry
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarDiaryEntry'
+      responses:
+        '201':
+          description: Entry created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarDiaryEntry'
+
+  /entries/{entryId}:
+    get:
+      tags: [Entries]
+      summary: Get specific entry
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/entryId'
+      responses:
+        '200':
+          description: Entry details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalendarDiaryEntry'
+
+  # Forum
+  /forum/posts:
+    get:
+      tags: [Forum]
+      summary: Get all forum posts (public)
+      responses:
+        '200':
+          description: List of forum posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForumPost'
+
+    post:
+      tags: [Forum]
+      summary: Create forum post (requires auth)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForumPost'
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumPost'
+
+# Tags for grouping
+tags:
+  - name: Authentication
+    description: User login
+  - name: Entries
+    description: Combined calendar/diary entries
+  - name: Forum
+    description: Public discussion board
