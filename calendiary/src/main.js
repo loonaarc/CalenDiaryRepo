@@ -1,20 +1,21 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-//import store from './store'
-import router from './router'
-//import axios from 'axios'
-import Vuex from 'vuex'
+// Import Vue core
+import { createApp } from 'vue';
+// Import root component
+import App from './App.vue';
+// Import the router instance
+import router from './router';
+
+// Import Vuetify styles
+import 'vuetify/styles';
+import vuetify from './plugins/vuetify.js';
 
 
-//axios.defaults.baseURL = 'http://localhost:8001/'
-
+// Create Vue application
 const app = createApp(App);
 
+// Use router and Vuetify plugins
+app.use(router);
+app.use(vuetify);
 
-app.config.devtools = true;
-//app.config.globalProperties.$axios = axios;
-
-//Vuex for endpoints
-//TODO: add .usestore later
-app.use(router).use(Vuex).mount('#app')
-
+// Mount the app to the DOM
+app.mount('#app');
